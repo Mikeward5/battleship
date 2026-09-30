@@ -26,6 +26,14 @@ describe("when i place a ship", () => {
     const expected = [ship, ship, ship];
     assert.deepStrictEqual(result, expected);
   });
+  it("the ships array is populated", () => {
+    const board = new GameBoard();
+    const ship = new Ship(1);
+    board.placeShip(ship, [4, 2], "horizontal");
+    const result = board.ships;
+    const expected = [ship];
+    assert.deepStrictEqual(result, expected);
+  });
   it("vertically at [2,4], it occupies [2,4], [2,5], and [2,6]", () => {
     const board = new GameBoard();
     const ship = new Ship(3);
@@ -123,5 +131,58 @@ describe("when using receiveAttack()", () => {
     const result = board.missedAttacks;
     const expected = [[4, 2]];
     assert.deepStrictEqual(result, expected);
+  });
+  it("Attacking a destroyed ship again does not record the coordinates twice", () => {
+    const board = new GameBoard();
+    const ship = new Ship(1);
+    board.placeShip(ship, [4, 2], "horizontal");
+    board.receiveAttack([4, 2]);
+    board.receiveAttack([4, 2]);
+    const result = board.successfulAttacks;
+    const expected = [[4, 2]];
+    assert.deepStrictEqual(result, expected);
+  });
+});
+
+describe("when i use allShipsSunk()", () => {
+  it("if board has one ship that hasnt been attacked yet, are all ships sunk", () => {
+    const board = new GameBoard();
+    const ship = new Ship(1);
+    board.placeShip(ship, [4, 2], "horizontal");
+    const result = board.allShipsSunk();
+    const expected = false;
+    assert.strictEqual(result, expected);
+  });
+  it("if board has one ship that has been destroyed, are all ships sunk", () => {
+    const board = new GameBoard();
+    const ship = new Ship(1);
+    board.placeShip(ship, [4, 2], "horizontal");
+    board.receiveAttack([4, 2]);
+    const result = board.allShipsSunk();
+    const expected = true;
+    assert.strictEqual(result, expected);
+  });
+  it("if board has two ships and one ship is destroyed, are all ships classed as sunk", () => {
+    const board = new GameBoard();
+    const ship1 = new Ship(1);
+    const ship2 = new Ship(1);
+    board.placeShip(ship1, [4, 2], "horizontal");
+    board.placeShip(ship2, [2, 4], "horizontal");
+    board.receiveAttack([4, 2]);
+    const result = board.allShipsSunk();
+    const expected = false;
+    assert.strictEqual(result, expected);
+  });
+  it("if board has two ships and both ships are destroyed, are all ships classed as sunk", () => {
+    const board = new GameBoard();
+    const ship1 = new Ship(1);
+    const ship2 = new Ship(1);
+    board.placeShip(ship1, [4, 2], "horizontal");
+    board.placeShip(ship2, [2, 4], "horizontal");
+    board.receiveAttack([4, 2]);
+    board.receiveAttack([2, 4]);
+    const result = board.allShipsSunk();
+    const expected = true;
+    assert.strictEqual(result, expected);
   });
 });

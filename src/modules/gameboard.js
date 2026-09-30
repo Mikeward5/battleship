@@ -4,6 +4,7 @@ export class GameBoard {
     this.createBoard();
     this.missedAttacks = [];
     this.successfulAttacks = [];
+    this.ships = [];
   }
   createBoard() {
     for (let i = 0; i < 10; i++) {
@@ -44,6 +45,7 @@ export class GameBoard {
         this.board[y + i][x] = ship;
       }
     }
+    this.ships.push(ship);
   }
   receiveAttack(coordinate) {
     const x = coordinate[0];
@@ -67,5 +69,10 @@ export class GameBoard {
       this.board[y][x].hit();
       this.successfulAttacks.push([x, y]);
     }
+  }
+  allShipsSunk() {
+    return this.ships.every((ship) => {
+      return ship.destroyed;
+    });
   }
 }
