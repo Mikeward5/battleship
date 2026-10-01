@@ -1,8 +1,10 @@
 export class Ship {
-  constructor(length) {
+  constructor(id, length) {
+    this.id = id;
     this.length = length;
     this.hitPoints = length;
     this.destroyed = false;
+    this.alreadyPlaced = false;
   }
   hit() {
     if (this.destroyed) {
