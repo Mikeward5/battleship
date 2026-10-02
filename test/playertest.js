@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { mock } from "node:test";
 import { Player, Computer } from "../src/modules/player.js";
 
 describe("When i create a Player", () => {
@@ -41,19 +42,22 @@ describe("When i create a computer", () => {
   });
   it("When I ask the Computer for an attack coordinate, it should return an array", () => {
     const computer = new Computer();
-    const result = computer.attackPlayer();
+    const player = new Player();
+    const result = computer.attackPlayer(player.gameBoard);
     const expected = true;
     assert.strictEqual(Array.isArray(result), expected);
   });
   it("When I ask the Computer for an attack coordinate, it should return an array containing two numbers", () => {
     const computer = new Computer();
-    const result = computer.attackPlayer();
+    const player = new Player();
+    const result = computer.attackPlayer(player.gameBoard);
     const expected = 2;
     assert.strictEqual(result.length, expected);
   });
   it("When I ask the Computer for an attack coordinate, it should return an array containing two numbers", () => {
     const computer = new Computer();
-    const test = computer.attackPlayer();
+    const player = new Player();
+    const test = computer.attackPlayer(player.gameBoard);
     const result = Number.isInteger(test[0]) && Number.isInteger(test[1]);
     const expected = true;
     assert.strictEqual(result, expected);
@@ -66,9 +70,52 @@ describe("When i create a computer", () => {
   });
   it("When a Computer uses attackPlayer it stores the coords in the attacks array", () => {
     const computer = new Computer();
-    computer.attackPlayer();
+    const player = new Player();
+    computer.attackPlayer(player.gameBoard);
     const result = computer.attacks;
     const expected = 1;
     assert.strictEqual(result.length, expected);
+  });
+  it("After calling attackPlayer() twice, attacks should contain two coordinates.", () => {
+    const computer = new Computer();
+    const player = new Player();
+    computer.attackPlayer(player.gameBoard);
+    computer.attackPlayer(player.gameBoard);
+    const result = computer.attacks.length;
+    const expected = 2;
+    assert.strictEqual(result, expected);
+  });
+  it("Computer should discard an attack coordinate it has already used", () => {
+    const computer = new Computer();
+    const player = new Player();
+    const values = [0.5, 0.5, 0.5, 0.5, 0.6, 0.6];
+    let counter = 0;
+
+    mock.method(Math, "random", () => {
+      const value = values[counter];
+      counter += 1;
+      return value;
+    });
+
+    computer.attackPlayer(player.gameBoard);
+    computer.attackPlayer(player.gameBoard);
+
+    const result = computer.attacks;
+    const expected = [
+      [5, 5],
+      [6, 6],
+    ];
+
+    assert.deepStrictEqual(result, expected);
+
+    mock.restoreAll();
+  });
+  it("When Computer.attackPlayer(opponentGameBoard) is called, the opponent's GameBoard receives the attack.", () => {
+    const computer = new Computer();
+    const player = new Player();
+    computer.attackPlayer(player.gameBoard);
+    const result = player.gameBoard.missedAttacks.length;
+    const expected = 1;
+    assert.strictEqual(result, expected);
   });
 });
