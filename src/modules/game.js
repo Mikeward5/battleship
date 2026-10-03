@@ -26,8 +26,12 @@ export class Game {
     if (this.gameOver) {
       return;
     }
-    this.computer.attackPlayer(this.player.gameBoard);
+
+    const coordinate = this.computer.attackPlayer(this.player.gameBoard);
+
     this.switchTurn();
+
+    return coordinate;
   }
   checkGameOver() {
     const playerCondition = this.player.gameBoard.allShipsSunk();
